@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bun Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #fbfaf8;
+            overflow: hidden;
+        }
+
+        .frame {
+            position: relative;
+            width: 1512px;
+            height: 982px;
+            background-color: #fbfaf8;
+            display: none;
+        }
+
+        .frame.active {
+            display: block;
+        }
+
+        /* Frame 1 Elements */
+        #bun1 {
+            position: absolute;
+            left: 439px;
+            top: 280px;
+            width: 634px;
+            height: 634px;
+            cursor: pointer;
+        }
+
+        #bun1 img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 50%;
+            pointer-events: none;
+        }
+
+        #text {
+            position: absolute;
+            left: 592px;
+            top: 119px;
+            width: 328px;
+            height: 162px;
+            font-family: 'Helvetica', sans-serif;
+            font-weight: bold;
+            font-size: 36px;
+            line-height: 1.5;
+            letter-spacing: -0.396px;
+            color: #000000;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        #eatclick {
+            position: absolute;
+            left: 1378px;
+            top: 37px;
+            width: 82px;
+            height: 82px;
+            cursor: pointer;
+        }
+
+        #ellipse2 {
+            position: absolute;
+            width: 82px;
+            height: 82px;
+        }
+
+        #ellipse2 img {
+            width: 100%;
+            height: 100%;
+        }
+
+        #eaticon {
+            position: absolute;
+            left: 18px;
+            top: 18px;
+            width: 45px;
+            height: 45px;
+        }
+
+        #eaticon img {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Frame 2 Elements */
+        #bun3 {
+            position: absolute;
+            left: 439px;
+            top: 280px;
+            width: 634px;
+            height: 634px;
+        }
+
+        #bun3 img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 50%;
+            pointer-events: none;
+        }
+
+        #emoji {
+            position: absolute;
+            left: 756px;
+            top: 213px;
+            font-family: 'Helvetica', sans-serif;
+            font-weight: bold;
+            font-size: 40px;
+            line-height: 1.5;
+            letter-spacing: -0.44px;
+            color: #000000;
+            text-align: center;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Frame 1 -->
+    <div class="frame active" id="frame1">
+        <div id="bun1">
+            <img src="https://www.figma.com/api/mcp/asset/04dcea7d-080c-4a14-9878-aabd6e164a40" alt="">
+        </div>
+
+        <div id="text">
+            <p>Touch Me!!!!!</p>
+            <p>Drag ME!!!</p>
+            <p>And Then EAT ME!!</p>
+        </div>
+
+        <div id="eatclick">
+            <div id="ellipse2">
+                <img src="https://www.figma.com/api/mcp/asset/2f526970-565d-40ea-bac8-c73120e1ba0b" alt="">
+            </div>
+            <div id="eaticon">
+                <img src="https://www.figma.com/api/mcp/asset/f3a23ea6-b00f-45cb-9853-0191582de4dd" alt="">
+            </div>
+        </div>
+    </div>
+
+    <!-- Frame 2 -->
+    <div class="frame" id="frame2">
+        <div id="bun3">
+            <img src="https://www.figma.com/api/mcp/asset/490100e3-09fb-4268-a840-111b92c52f45" alt="">
+        </div>
+
+        <p id="emoji">ヽ(*＾ω＾*)ﾉ</p>
+    </div>
+
+    <script>
+        const frame1 = document.getElementById('frame1');
+        const frame2 = document.getElementById('frame2');
+        const bun1 = document.getElementById('bun1');
+        const eatButton = document.getElementById('eatclick');
+
+        function showFrame2() {
+            frame1.classList.remove('active');
+            frame2.classList.add('active');
+        }
+
+        bun1.addEventListener('click', showFrame2);
+        eatButton.addEventListener('click', showFrame2);
+    </script>
+</body>
+</html>
