@@ -194,66 +194,6 @@
             pointer-events: none;
         }
 
-        /* 音频控制面板 */
-        .audio-panel {
-            position: absolute;
-            top: 50px;
-            left: 50px;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            min-width: 300px;
-        }
-
-        .audio-panel h3 {
-            margin: 0 0 15px 0;
-            font-family: 'Helvetica', sans-serif;
-            font-size: 18px;
-        }
-
-        .frequency-display {
-            font-size: 36px;
-            font-weight: bold;
-            color: #667eea;
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .audio-btn {
-            padding: 10px 20px;
-            margin: 5px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .audio-btn.start {
-            background: #4ecdc4;
-            color: white;
-        }
-
-        .audio-btn.start:hover {
-            background: #45b8b0;
-        }
-
-        .audio-btn.stop {
-            background: #ff6b6b;
-            color: white;
-        }
-
-        .audio-btn.stop:hover {
-            background: #ee5a52;
-        }
-
-        .status-text {
-            margin-top: 10px;
-            font-size: 12px;
-            color: #666;
-        }
     </style>
 </head>
 <body>
@@ -281,15 +221,6 @@
 
     <!-- Frame 2 -->
     <div class="frame" id="frame2">
-        <!-- 音频控制面板 -->
-        <div class="audio-panel">
-            <h3>🎤 音频频率检测</h3>
-            <div class="frequency-display" id="frequencyDisplay">0 Hz</div>
-            <button class="audio-btn start" id="startAudioBtn">开始检测</button>
-            <button class="audio-btn stop" id="stopAudioBtn" style="display:none;">停止检测</button>
-            <div class="status-text" id="statusText">点击"开始检测"启动麦克风</div>
-        </div>
-
         <div id="bun2-frame2" class="slime-stretchable">
             <img src="https://www.figma.com/api/mcp/asset/04dcea7d-080c-4a14-9878-aabd6e164a40" alt="">
         </div>
@@ -338,15 +269,26 @@
                 currentX = e.clientX - startX;
                 currentY = e.clientY - startY;
 
-                // 根据拖拽距离计算拉伸
-                const scaleX = 1 + Math.abs(currentX) / 300;
-                const scaleY = 1 + Math.abs(currentY) / 300;
+                // 史莱姆拉伸效果：拖拽方向拉伸，垂直方向压缩
+                // 保持体积大致不变（scaleX * scaleY ≈ 1）
+                const distance = Math.sqrt(currentX * currentX + currentY * currentY);
+                const stretchFactor = 1 + distance / 400;
 
-                // 限制最大拉伸
-                const finalScaleX = Math.min(scaleX, 1.8);
-                const finalScaleY = Math.min(scaleY, 1.8);
+                // 根据拖拽方向计算拉伸
+                let scaleX = 1;
+                let scaleY = 1;
 
-                element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${finalScaleX}, ${finalScaleY})`;
+                if (Math.abs(currentX) > Math.abs(currentY)) {
+                    // 主要是水平拖拽
+                    scaleX = Math.min(stretchFactor, 1.6);
+                    scaleY = Math.max(1 / stretchFactor, 0.7);
+                } else {
+                    // 主要是垂直拖拽
+                    scaleY = Math.min(stretchFactor, 1.6);
+                    scaleX = Math.max(1 / stretchFactor, 0.7);
+                }
+
+                element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scaleX}, ${scaleY})`;
             });
 
             document.addEventListener('mouseup', () => {
@@ -376,13 +318,21 @@
                 currentX = touch.clientX - startX;
                 currentY = touch.clientY - startY;
 
-                const scaleX = 1 + Math.abs(currentX) / 300;
-                const scaleY = 1 + Math.abs(currentY) / 300;
+                const distance = Math.sqrt(currentX * currentX + currentY * currentY);
+                const stretchFactor = 1 + distance / 400;
 
-                const finalScaleX = Math.min(scaleX, 1.8);
-                const finalScaleY = Math.min(scaleY, 1.8);
+                let scaleX = 1;
+                let scaleY = 1;
 
-                element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${finalScaleX}, ${finalScaleY})`;
+                if (Math.abs(currentX) > Math.abs(currentY)) {
+                    scaleX = Math.min(stretchFactor, 1.6);
+                    scaleY = Math.max(1 / stretchFactor, 0.7);
+                } else {
+                    scaleY = Math.min(stretchFactor, 1.6);
+                    scaleX = Math.max(1 / stretchFactor, 0.7);
+                }
+
+                element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scaleX}, ${scaleY})`;
             });
 
             document.addEventListener('touchend', () => {
@@ -428,11 +378,6 @@
         let animationId;
         let isAudioActive = false;
 
-        const startAudioBtn = document.getElementById('startAudioBtn');
-        const stopAudioBtn = document.getElementById('stopAudioBtn');
-        const frequencyDisplay = document.getElementById('frequencyDisplay');
-        const statusText = document.getElementById('statusText');
-
         async function startAudioDetection() {
             if (isAudioActive) return; // 防止重复启动
 
@@ -452,15 +397,11 @@
                 microphone.connect(analyser);
 
                 isAudioActive = true;
-                startAudioBtn.style.display = 'none';
-                stopAudioBtn.style.display = 'inline-block';
-                statusText.textContent = '✅ 正在检测音频频率...';
 
                 detectFrequency();
 
             } catch (error) {
                 console.error('无法访问麦克风:', error);
-                statusText.textContent = '❌ 无法访问麦克风，请允许权限';
             }
         }
 
@@ -476,10 +417,6 @@
             }
 
             isAudioActive = false;
-            startAudioBtn.style.display = 'inline-block';
-            stopAudioBtn.style.display = 'none';
-            statusText.textContent = '已停止检测';
-            frequencyDisplay.textContent = '0 Hz';
 
             // 移除抖动效果
             bun2Frame2.classList.remove('vibrate-1', 'vibrate-2', 'vibrate-3');
@@ -507,8 +444,6 @@
 
             // 只在 200-1200 Hz 范围内响应
             if (frequency >= 200 && frequency <= 1200 && maxValue > 50) {
-                frequencyDisplay.textContent = Math.round(frequency) + ' Hz';
-
                 // 根据频率计算抖动强度
                 // 200Hz = 弱抖动, 600Hz = 中等抖动, 1000Hz+ = 强烈抖动
                 let vibrationLevel = 0;
@@ -525,23 +460,14 @@
                 bun2Frame2.classList.remove('vibrate-1', 'vibrate-2', 'vibrate-3');
                 if (vibrationLevel > 0) {
                     bun2Frame2.classList.add(`vibrate-${vibrationLevel}`);
-                    const intensityStars = '⭐'.repeat(vibrationLevel);
-                    statusText.textContent = `🎵 频率: ${Math.round(frequency)} Hz - 强度: ${intensityStars}`;
                 }
             } else {
                 // 不在范围内，移除抖动
                 bun2Frame2.classList.remove('vibrate-1', 'vibrate-2', 'vibrate-3');
-                if (frequency > 0 && maxValue > 50) {
-                    frequencyDisplay.textContent = Math.round(frequency) + ' Hz';
-                    statusText.textContent = '请发出 200-1200 Hz 的声音';
-                }
             }
 
             animationId = requestAnimationFrame(detectFrequency);
         }
-
-        startAudioBtn.addEventListener('click', startAudioDetection);
-        stopAudioBtn.addEventListener('click', stopAudioDetection);
 
         // 页面卸载时清理
         window.addEventListener('beforeunload', () => {
